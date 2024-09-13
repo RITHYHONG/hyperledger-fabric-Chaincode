@@ -1,0 +1,38 @@
+version: '2'
+
+networks:
+  fabric-network:
+
+services:
+  orderer1.example.com:
+    container_name: orderer1.example.com
+    image: hyperledger/fabric-orderer
+    environment:
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+    volumes:
+      - ./genesis.block:/var/hyperledger/orderer/genesis.block
+    ports:
+      - 7050:7050
+    networks:
+      - fabric-network
+
+  peer0.org1.example.com:
+    container_name: peer0.org1.example.com
+    image: hyperledger/fabric-peer
+    environment:
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_PEER_ID=peer0.org1.example.com
+    ports:
+      - 7051:7051
+    networks:
+      - fabric-network
+
+  couchdb0:
+    container_name: couchdb0
+    image: hyperledger/fabric-couchdb
+    ports:
+      - 5984:5984
+    networks:
+      - fabric-network

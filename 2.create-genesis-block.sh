@@ -1,0 +1,1 @@
+configtxgen --profile TwoOrgs --outputBlock ./artifact/genesis.block --channelID genesis --configPath ${PWD}/config/

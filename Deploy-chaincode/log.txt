@@ -1,0 +1,2 @@
+Installed chaincodes on peer:
+Package ID: mycc_1:22f61ec03e3e5f8382ed6fefc2bd27f4b22609ab048631c382270cc2bac4bb5e, Label: mycc_1

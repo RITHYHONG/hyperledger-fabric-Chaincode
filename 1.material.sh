@@ -1,0 +1,1 @@
+cryptogen generate --config=./cryptogen-config.yaml
