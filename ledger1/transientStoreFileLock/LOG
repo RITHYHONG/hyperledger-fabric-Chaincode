@@ -1,6 +1,6 @@
 =============== Sep 13, 2024 (+07) ===============
-16:36:35.223888 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
-16:36:35.234737 db@open opening
-16:36:35.241367 version@stat F·[] S·0B[] Sc·[]
-16:36:35.245230 db@janitor F·2 G·0
-16:36:35.245314 db@open done T·10.452024ms
+17:10:37.400663 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:10:37.411370 db@open opening
+17:10:37.415252 version@stat F·[] S·0B[] Sc·[]
+17:10:37.420942 db@janitor F·2 G·0
+17:10:37.421000 db@open done T·9.532878ms

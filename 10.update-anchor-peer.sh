@@ -9,6 +9,5 @@ export CORE_PEER_MSPCONFIGPATH=${PWD}/crypto-config/peerOrganizations/org1.examp
 export CORE_PEER_ADDRESS=localhost:7051
 
 peer channel update -o localhost:7050 \
-                    --ordererTLSHostnameOverride orderer.example.com \
                     -c channel -f ./artifact/Org1Anchor.tx \
                     --tls --cafile ${PWD}/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem

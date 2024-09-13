@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
-
+	"github.com/golang/protobuf/ptypes"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"strconv"
 )
 
 type SmartContract struct {
@@ -50,6 +50,87 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	return nil
 }
 
+func (s *SmartContract) CreateCarWithCompositeKey(ctx contractapi.TransactionContextInterface, carNumber string, make string, model string, colour string, owner string) error {
+	car := Car{
+		Make:   make,
+		Model:  model,
+		Colour: colour,
+		Owner:  owner,
+	}
+
+	carAsBytes, err := json.Marshal(car)
+	if err != nil {
+		return fmt.Errorf("failed to marshal car: %v", err)
+	}
+
+	result := ctx.GetStub().PutState(carNumber, carAsBytes)
+
+	indexName := "owner-key"
+	compositeKey, err := ctx.GetStub().CreateCompositeKey(indexName, []string{car.Owner, carNumber})
+	if err != nil {
+		return fmt.Errorf("failed to create composite key: %v", err)
+	}
+
+	ctx.GetStub().PutState(compositeKey, carAsBytes)
+
+	return result
+}
+
+func (s *SmartContract) QueryCarsByOwner(ctx contractapi.TransactionContextInterface, owner string) ([]Car, error) {
+
+	resultsIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("owner-key", []string{owner})
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	var cars []Car
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var car Car
+		err = json.Unmarshal(queryResponse.Value, &car)
+		if err != nil {
+			return nil, err
+		}
+		cars = append(cars, car)
+	}
+
+	return cars, nil
+}
+
+func (s *SmartContract) CreateCar(ctx contractapi.TransactionContextInterface, carNumber string, make string, model string, colour string, owner string) error {
+	car := Car{
+		Make:   make,
+		Model:  model,
+		Colour: colour,
+		Owner:  owner,
+	}
+
+	carAsBytes, _ := json.Marshal(car)
+
+	return ctx.GetStub().PutState(carNumber, carAsBytes)
+}
+
+func (s *SmartContract) QueryCar(ctx contractapi.TransactionContextInterface, carNumber string) (*Car, error) {
+	carAsBytes, err := ctx.GetStub().GetState(carNumber)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read from world state. %s", err.Error())
+	}
+
+	if carAsBytes == nil {
+		return nil, fmt.Errorf("%s does not exist", carNumber)
+	}
+
+	car := new(Car)
+	_ = json.Unmarshal(carAsBytes, car)
+
+	return car, nil
+}
 
 func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface) ([]QueryResult, error) {
 	startKey := "CAR0"
@@ -81,6 +162,64 @@ func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface
 	return results, nil
 }
 
+func (s *SmartContract) ChangeCarOwner(ctx contractapi.TransactionContextInterface, carNumber string, newOwner string) error {
+	car, err := s.QueryCar(ctx, carNumber)
+
+	if err != nil {
+		return err
+	}
+
+	car.Owner = newOwner
+
+	carAsBytes, _ := json.Marshal(car)
+
+	return ctx.GetStub().PutState(carNumber, carAsBytes)
+}
+
+type HistoryQueryResult struct {
+	TxId      string `json:"txId"`
+	Timestamp string `json:"timestamp"`
+	IsDelete  bool   `json:"isDelete"`
+	Value     Car    `json:"value"`
+}
+
+func (s *SmartContract) GetHistoryForAsset(ctx contractapi.TransactionContextInterface, assetID string) ([]*HistoryQueryResult, error) {
+	resultsIterator, err := ctx.GetStub().GetHistoryForKey(assetID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get history for asset %s: %v", assetID, err)
+	}
+	defer resultsIterator.Close()
+
+	var history []*HistoryQueryResult
+	for resultsIterator.HasNext() {
+		response, err := resultsIterator.Next()
+		if err != nil {
+			return nil, fmt.Errorf("failed to iterate history for asset %s: %v", assetID, err)
+		}
+
+		var tx Car
+		if len(response.Value) > 0 {
+			err = json.Unmarshal(response.Value, &tx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal history value for asset %s: %v", assetID, err)
+			}
+		}
+
+		timestamp, err := ptypes.Timestamp(response.Timestamp)
+		if err != nil {
+			return nil, err
+		}
+
+		history = append(history, &HistoryQueryResult{
+			TxId:      response.TxId,
+			Timestamp: timestamp.String(),
+			IsDelete:  response.IsDelete,
+			Value:     tx,
+		})
+	}
+
+	return history, nil
+}
 
 func main() {
 
