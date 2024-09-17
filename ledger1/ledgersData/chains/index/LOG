@@ -1,6 +1,16 @@
-=============== Sep 13, 2024 (+07) ===============
-17:10:37.484632 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
-17:10:37.494931 db@open opening
-17:10:37.495136 version@stat F·[] S·0B[] Sc·[]
-17:10:37.498701 db@janitor F·2 G·0
-17:10:37.498750 db@open done T·3.77495ms
+=============== Sep 16, 2024 (+07) ===============
+08:34:44.790623 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+08:34:44.801411 db@open opening
+08:34:44.801689 version@stat F·[] S·0B[] Sc·[]
+08:34:44.805406 db@janitor F·2 G·0
+08:34:44.805462 db@open done T·3.9947ms
+=============== Sep 16, 2024 (+07) ===============
+08:38:26.563077 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+08:38:26.563261 version@stat F·[] S·0B[] Sc·[]
+08:38:26.563342 db@open opening
+08:38:26.563389 journal@recovery F·1
+08:38:26.563795 journal@recovery recovering @1
+08:38:26.570288 memdb@flush created L0@2 N·1 S·119B "_\x00f,v1":"_\x00f,v1"
+08:38:26.570809 version@stat F·[1] S·119B[119B] Sc·[0.25]
+08:38:26.586733 db@janitor F·3 G·0
+08:38:26.586795 db@open done T·23.437799ms
